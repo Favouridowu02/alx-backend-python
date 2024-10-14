@@ -6,6 +6,7 @@
 import asyncio
 import random
 import time
+from typing import IO
 
 
 async def wait_random(max_delay: int = 10) -> int:
