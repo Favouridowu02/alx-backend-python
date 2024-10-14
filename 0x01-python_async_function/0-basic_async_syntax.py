@@ -8,7 +8,7 @@ import random
 import time
 
 
-async def wait_random(max_delay=10):
+async def wait_random(max_delay: int =10) -> int:
     """
         This Function is an asynchronous function that takes in an
         integer argument with a default value of 10.
