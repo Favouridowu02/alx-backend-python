@@ -18,10 +18,9 @@ async def wait_random(max_delay=10):
 
         Return: It returns the total time spent to load.
     """
-    t = random.randint(0, max_delay)
-    initial = time.time()
+    t = random.uniform(0, max_delay)
+    initial = time.perf_counter()
     await asyncio.sleep(t)
-    time_difference = time.time() - 1
-    return time_difference
-
+    final = time.perf_counter() - initial
+    return final
 
