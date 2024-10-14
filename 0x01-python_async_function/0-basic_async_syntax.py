@@ -7,6 +7,7 @@ import asyncio
 import random
 import time
 
+
 async def wait_random(max_delay=10):
     """
         This Function is an asynchronous function that takes in an
@@ -23,4 +24,3 @@ async def wait_random(max_delay=10):
     await asyncio.sleep(t)
     final = time.perf_counter() - initial
     return final
-
