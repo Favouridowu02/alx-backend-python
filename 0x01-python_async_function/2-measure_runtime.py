@@ -3,13 +3,15 @@
     This Module contains a function measure_time that is measures the
     total execution time
 """
-from '2-measure_runtime' import wait_n
 import time
 import asyncio
 import random
 
 
-async def measure_time(n: int, max_delay: int) -> int:
+wait_n = __import__('1-concurrent_coroutines').wait_n
+
+
+def measure_time(n: int, max_delay: int) -> int:
     """
         This function measures the execution time for 
         wait_n(n, max_delay)
@@ -21,5 +23,5 @@ async def measure_time(n: int, max_delay: int) -> int:
         Return: total_time / n 
     """
     initial = time.perf_counter()
-    await wait_n(n, max_delay)
-    return time_perf_counter() - initial
+    asyncio.run(wait_n(n, max_delay))
+    return (time.perf_counter() - initial) / n
