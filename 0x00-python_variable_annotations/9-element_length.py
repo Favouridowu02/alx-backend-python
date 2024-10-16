@@ -7,7 +7,7 @@ from typing import Iterable, Sequence, List, Tuple
 
 def element_length(lst: Iterable[Sequence]) -> List[Tuple[Sequence, int]]:
     """
-        This is an Anotated function 
+        This is an Anotated function
 
         Argument:
             lst: an Iterable Sequence
