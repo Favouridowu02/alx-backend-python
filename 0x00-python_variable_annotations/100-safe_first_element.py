@@ -4,10 +4,8 @@
 """
 from typing import List, Union, Sequence, Any, NewType
 
-NoneType = NewType('NoneType', None)
 
-
-def safe_first_element(lst: Sequence[Any]) -> Union[Any, NoneType]:
+def safe_first_element(lst: Sequence[Any]) -> Union[Any, None]:
     """
         This is an annotated Function
     """
