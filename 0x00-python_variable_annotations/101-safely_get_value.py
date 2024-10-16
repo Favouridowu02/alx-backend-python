@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """
     This Module contains a type-annotated function like safely_get_value
 """
