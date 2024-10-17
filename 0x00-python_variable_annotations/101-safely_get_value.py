@@ -2,11 +2,11 @@
 """
     This Module contains a type-annotated function like safely_get_value
 """
-from typing import Union, Mapping, Any, TypeVar, TypeAlias
+from typing import Union, Mapping, Any, TypeVar
 
 T = TypeVar('T')
-D: TypeAlias = Union[T, None]
-R: TypeAlias = Union[Any, T]
+D = Union[T, None]
+R = Union[Any, T]
 
 
 def safely_get_value(dct: Mapping, key: Any, default: D = None) -> R:
