@@ -2,8 +2,8 @@
 """
     This Module contains the unittest test cases utils module
 """
-from unittest import TestCase
-from utils import access_nested_map
+from unittest import TestCase, mock
+from utils import access_nested_map, get_json
 from parameterized import parameterized, param
 
 
@@ -34,3 +34,22 @@ class TestAccessNestedMap(TestCase):
         """
         with self.assertRaises(KeyError):
             access_nested_map(nested_map, path)
+
+
+class TestGetJson(TestCase):
+    """
+        This Class contains the test cases for the function `get_json`
+    """
+    @parameterized.expand([
+        param(test_url="http://example.com", test_payload={"payload": True}),
+        param(test_url="http://holberton.io", test_payload={"payload": False}),
+    ])
+    @mock.patch('utils.get_json')
+    def test_get_json(self, mocked_get_json, test_url, test_payload):
+        """
+            This Method is used to test the the get_jsom method for expected
+            results
+        """
+        mocked_get_json.return_value = test_payload
+        result = mocked_get_json(test_url)
+        self.assertEqual(result, test_payload)
