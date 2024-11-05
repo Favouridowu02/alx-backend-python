@@ -22,3 +22,15 @@ class TestAccessNestedMap(TestCase):
             This method is used to test the access_nested_map function
         """
         self.assertEqual(access_nested_map(nested_map, path), expected)
+
+    @parameterized.expand([
+        param(nested_map={}, path=("a",)),
+        param(nested_map={"a": 1}, path=("a", "b"))
+    ])
+    def test_access_nested_map_exception(self, nested_map, path):
+        """
+            This method is used to test the exception of the access_nested_map
+            function
+        """
+        with self.assertRaises(KeyError):
+            access_nested_map(nested_map, path)
