@@ -26,8 +26,9 @@ class TestGithubOrgClient(TestCase):
         mocked_org.called_once_with(f"https://api.github.com/orgs/{org}")
 
     def test_public_repos_url(self):
-        """ Test that the result of _public_repos_url
-        return the correct value based on the given payload
+        """
+            Test that the result of _public_repos_url
+            return the correct value based on the given payload
         """
         with mock.patch('client.GithubOrgClient.org',
                 new_callable=mock.PropertyMock) as MockPublic:
@@ -35,3 +36,19 @@ class TestGithubOrgClient(TestCase):
             MockPublic.return_value = expected
             test_instance = MockPublic()
             self.assertEqual(test_instance, expected)
+
+    @mock.patch('client.get_json')
+    def test_public_repos(self, mock_get_json):
+        """
+            Test to unit-test GithubOrgClient.public_repos
+        """
+        expected = {'hi': 'testing'}
+        mock_get_json.return_value = expected
+        with mock.patch('client.GithubOrgClient._public_repos_url',
+                new_callable=mock.PropertyMock) as MockPublic:
+            MockPublic.return_value = expected
+            mock_get_json()
+            test_instance = MockPublic()
+            self.assertEqual(test_instance, expected)
+            mock_get_json.assert_called_once()
+            MockPublic.assert_called_once()
