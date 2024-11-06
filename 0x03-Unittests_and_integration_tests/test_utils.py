@@ -3,7 +3,7 @@
     This Module contains the unittest test cases utils module
 """
 from unittest import TestCase, mock
-from utils import access_nested_map, get_json
+from utils import access_nested_map, get_json, memoize
 from parameterized import parameterized, param
 
 
@@ -53,3 +53,26 @@ class TestGetJson(TestCase):
         mocked_get_json.return_value = test_payload
         result = mocked_get_json(test_url)
         self.assertEqual(result, test_payload)
+
+
+class TestMemoize(TestCase):
+    """
+        This Class contains the test cases for the function decorator `memoize`
+    """
+    def test_memoize(self):
+        """
+            This Method is used to test the memoize decorator
+        """
+        class TestClass:
+            def a_method(self):
+                return 42
+
+            @memoize
+            def a_property(self):
+                return self.a_method()
+        with mock.patch.object(TestClass, 'a_method') as aMethod:
+            my_object = TestClass()
+            my_object.a_property()
+            my_object.a_property()
+#            with self.assertDoesNotRaise():
+            aMethod.assert_called_once()
