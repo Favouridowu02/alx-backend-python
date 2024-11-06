@@ -24,3 +24,14 @@ class TestGithubOrgClient(TestCase):
         test_object.public_repos()
 
         mocked_org.called_once_with(f"https://api.github.com/orgs/{org}")
+
+    def test_public_repos_url(self):
+        """ Test that the result of _public_repos_url
+        return the correct value based on the given payload
+        """
+        with mock.patch('client.GithubOrgClient.org',
+                new_callable=mock.PropertyMock) as MockPublic:
+            expected = {'hi': 'testing'}
+            MockPublic.return_value = expected
+            test_instance = MockPublic()
+            self.assertEqual(test_instance, expected)
