@@ -31,7 +31,7 @@ class TestGithubOrgClient(TestCase):
             return the correct value based on the given payload
         """
         with mock.patch('client.GithubOrgClient.org',
-                new_callable=mock.PropertyMock) as MockPublic:
+                        new_callable=mock.PropertyMock) as MockPublic:
             expected = {'hi': 'testing'}
             MockPublic.return_value = expected
             test_instance = MockPublic()
@@ -41,13 +41,15 @@ class TestGithubOrgClient(TestCase):
     def test_public_repos(self, mock_get_json):
         """
             Test to unit-test GithubOrgClient.public_repos
-            Test that the list of repos is what you expect from the chosen payload.
-            Test that the mocked property and the mocked get_json was called once.
+            Test that the list of repos is what you expect from
+            the chosen payload.
+            Test that the mocked property and the mocked get_json
+            was called once.
         """
         expected = [{'name': 'testing'}]
         mock_get_json.return_value = expected
         with mock.patch('client.GithubOrgClient._public_repos_url',
-                new_callable=mock.PropertyMock) as MockPublic:
+                        new_callable=mock.PropertyMock) as MockPublic:
             MockPublic.return_value = "hi"
             test_instance = GithubOrgClient('test')
             result = test_instance.public_repos()
