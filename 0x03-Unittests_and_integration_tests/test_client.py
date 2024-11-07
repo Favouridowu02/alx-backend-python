@@ -93,9 +93,9 @@ class TestIntegrationGithubOrgClient(TestCase):
                 ]
                 }
         cls.get_patcher = patch('requests.get', **config)
-        cls.mock = cls.get_patcher.start()
+        cls.mock = self.get_patcher.start()
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         """This is the teardown method for the class"""
         cls.get_patcher.stop()
