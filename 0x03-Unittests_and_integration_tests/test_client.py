@@ -4,8 +4,8 @@
 """
 from client import GithubOrgClient
 from unittest import TestCase, mock
-from parameterized import parameterized, param
-
+from parameterized import parameterized, param, parameterized_class
+from fixtures import TEST_PAYLOAD
 
 class TestGithubOrgClient(TestCase):
     """
@@ -69,3 +69,33 @@ class TestGithubOrgClient(TestCase):
         test_instance = GithubOrgClient('test')
         result = test_instance.has_license(repo, license_key)
         self.assertEqual(result, expected)
+
+
+@parameterized_class(
+    ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
+    TEST_PAYLOAD
+)
+class TestIntegrationGithubOrgClient(TestCase):
+    """
+        This module contains the Integration test cases for the fixtures
+    """
+    @classmethod
+    def setUpClass(cls):
+        """
+            This is the setupClass method.
+            This is the method that would be run before any tests in
+            this class would be ran
+        """
+        config = {'return_value.json.side_effect':
+                [
+                    cls.org_payload, cls.repos_payload,
+                    cls.org_payload, cls.repos_payload
+                ]
+                }
+        cls.get_patcher = patch('requests.get', **config)
+        cls.mock = cls.get_patcher.start()
+
+    @classmethod
+    def tearDownClass(self):
+        """This is the teardown method for the class"""
+        cls.get_patcher.stop()
