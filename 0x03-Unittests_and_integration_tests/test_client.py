@@ -99,3 +99,13 @@ class TestIntegrationGithubOrgClient(TestCase):
     def tearDownClass(cls):
         """This is the teardown method for the class"""
         cls.get_patcher.stop()
+
+    def test_public_repos_with_license(self):
+        """ Integration test for public repos with License """
+        test_instance = GithubOrgClient('test')
+
+        self.assertEqual(test_instance.public_repos(), self.expected_repos)
+        self.assertEqual(test_class.public_repos("XLICENSE"), [])
+        self.assertEqual(test_class.public_repos(
+            "apache-2.0"), self.apache2_repos)
+        self.mock.assert_called()
