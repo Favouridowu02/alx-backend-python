@@ -92,7 +92,7 @@ class TestIntegrationGithubOrgClient(TestCase):
                     cls.org_payload, cls.repos_payload
                 ]
                 }
-        cls.get_patcher = mock.patch('requests.get', **config)
+        cls.get_patcher = patch('requests.get', **config)
         cls.mock = cls.get_patcher.start()
 
     @classmethod
