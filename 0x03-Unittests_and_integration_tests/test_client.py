@@ -7,6 +7,7 @@ from unittest import TestCase, mock
 from parameterized import parameterized, param, parameterized_class
 from fixtures import TEST_PAYLOAD
 
+
 class TestGithubOrgClient(TestCase):
     """
         This class contains the test cases for the GithibOrgClient claass
@@ -86,12 +87,10 @@ class TestIntegrationGithubOrgClient(TestCase):
             This is the method that would be run before any tests in
             this class would be ran
         """
-        config = {'return_value.json.side_effect':
-                [
-                    cls.org_payload, cls.repos_payload,
-                    cls.org_payload, cls.repos_payload
-                ]
-                }
+        config = {'return_value.json.side_effect': [
+            cls.org_payload, cls.repos_payload,
+            cls.org_payload, cls.repos_payload
+            ]}
         cls.get_patcher = patch('requests.get', **config)
         cls.mock = cls.get_patcher.start()
 
