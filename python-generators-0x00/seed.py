@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 """
 This module contains functions that seeds to the database
 """
@@ -8,7 +8,9 @@ def connect_db():
     """
         This Function is used to connect with the Database
     """
-    return create_engine('mysql+pymysql://user:password@localhost:3306')
+    engine = create_engine('mysql+pymysql://user:password@localhost:3306')
+    print("connections successfully")
+    return engine
 
 def create_database(connection):
     """
