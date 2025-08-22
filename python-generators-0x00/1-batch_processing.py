@@ -19,7 +19,7 @@ def stream_users_in_batches(batch_size):
         offset = 0
         while True:
             result = conn.execute(
-                text("SELECT * FROM users LIMIT :limit OFFSET :offset"),
+                text("SELECT * FROM user_data"),
                 {"limit": batch_size, "offset": offset}
             )
             batch = [dict(row) for row in result]
