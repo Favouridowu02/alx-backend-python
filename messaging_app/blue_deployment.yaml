@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: django-messaging-app
-          image: bill25concept/django-message-app:v2.0
+          image: bill25concept/django-message-app:1.0.0
           ports:
             - containerPort: 8000
           env:
