@@ -1,6 +1,20 @@
 import sqlite3 
 import functools
-from 1-with_db_connection import with_db_connection
+
+
+def with_db_connection(func):
+    """
+        This decorator provides a database connection to the wrapped function.
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        conn = sqlite3.connect("database.db")
+        try:
+            return func(conn, *args, **kwargs)
+        finally:
+            conn.close()
+    return wrapper
+
 
 def transactional(func):
     """
