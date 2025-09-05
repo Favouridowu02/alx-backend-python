@@ -9,25 +9,14 @@ Function views
     2. Add a URL to urlpatterns:  path('', views.home, name='home')
 Class-based views
     1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.authtoken import views as auth_views
+from django.urls import path
 
 urlpatterns = [
-    # admin
     path('admin/', admin.site.urls),
-    # OAuth2 provider URLs
-    path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
-
-    # api
-    path('api/', include('chats.urls')),
-
-    # Include chats app URLs
-    # path('api/', include('chats.urls')),
-    # path('api/auth/', auth_views.obtain_auth_token),
 ]
