@@ -1,4 +1,5 @@
 from django.db import models
+import uuid
 
 # Create your models here.
 class User(models.Model):
@@ -7,7 +8,7 @@ class User(models.Model):
         HOST = 'host', "Host"
         GUEST = "guest", "Guest"
 
-    user_id = models.UUIDField(primary_key=True)
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     first_name = models.CharField(max_length=30, null=False)
     last_name = models.CharField(max_length=30, null=False)
     email = models.EmailField(max_length=50, unique=True, null=False)
@@ -28,7 +29,7 @@ class Message(models.Model):
     message_body = models.TextField(null=False)
     sent_at = models.DateTimeField(auto_now_add=True)   
 
-class Conversion(models.Model):
-    conversion_id = models.UUIDField(primary_key=True)
+class Conversation(models.Model):
+    conversation_id = models.UUIDField(primary_key=True)
     participants_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations')
     created_at = models.DateTimeField(auto_now_add=True)
