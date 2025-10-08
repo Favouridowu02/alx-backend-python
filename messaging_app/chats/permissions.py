@@ -30,7 +30,7 @@ class IsParticipantOfConversation(permissions.BasePermission):
             except Exception:
                 pass
 
-        # Single participant FK (current simplified Conversation model) named participants_id
+        # Single participant FK (legacy) named participants_id
         if hasattr(obj, 'participants_id'):
             participant_user = getattr(obj, 'participants_id', None)
             if participant_user is not None:
@@ -39,27 +39,19 @@ class IsParticipantOfConversation(permissions.BasePermission):
         # Message referencing a conversation via `conversation` attr
         if hasattr(obj, 'conversation'):
             conversation = getattr(obj, 'conversation')
-            # Recurse once on conversation
             return self._is_participant(user, conversation)
 
         # Message with sender attribute (fallback) – ensure sender is the user
         for sender_attr in ['sender', 'sender_id']:
-            if hasattr(obj, sender_attr):
-                if getattr(obj, sender_attr) == user:
-                    return True
+            if hasattr(obj, sender_attr) and getattr(obj, sender_attr) == user:
+                return True
 
         return False
 
     def has_object_permission(self, request, view, obj):
-        # Must still be authenticated
         if not (request.user and request.user.is_authenticated):
             return False
-
         is_participant = self._is_participant(request.user, obj)
-
-        # Read-only safe methods allowed for participants only
         if request.method in permissions.SAFE_METHODS:
             return is_participant
-
-        # Mutating actions (POST, PUT, PATCH, DELETE) only for participants
         return is_participant
