@@ -28,19 +28,40 @@ class User(AbstractBaseUser, models.Model):
         null=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name"]
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}" if self.first_name and self.last_name else self.email
+
+
+class Conversation(models.Model):
+    """Conversation among multiple participants."""
+    conversation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    participants = models.ManyToManyField(User, related_name='conversations', blank=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated_at"]
+
+    def __str__(self):
+        return f"Conversation {self.conversation_id}"[:36]
+
 
 class Message(models.Model):
-    message_id = models.UUIDField(primary_key=True)
-    sender_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     message_body = models.TextField(null=False, blank=False)
     sent_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-class Conversation(models.Model):
-    """
-    This model is used to store the conversation details
-    """
-    conversation_id = models.UUIDField(primary_key=True)
-    participants_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='conversations')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering = ["sent_at"]
+        indexes = [
+            models.Index(fields=["conversation", "sent_at"]),
+        ]
+
+    def __str__(self):
+        return f"Msg {str(self.message_id)[:8]} by {self.sender_id}"
