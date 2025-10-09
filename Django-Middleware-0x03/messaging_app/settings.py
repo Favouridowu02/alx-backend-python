@@ -51,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'chats.middleware.RequestLoggingMiddleware',
+    'chats.middleware.RestrictAccessByTimeMiddleware',
 ]
 
 ROOT_URLCONF = 'messaging_app.urls'
@@ -165,3 +166,7 @@ LOGGING = {
         },
     },
 }
+
+
+CHAT_ACCESS_START_HOUR = 18  # 6 PM
+CHAT_ACCESS_END_HOUR = 21    # 9 PM
