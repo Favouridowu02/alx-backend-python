@@ -1,0 +1,18 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+  <h1>Message {{ message.id }} History</h1>
+  <p><strong>Current content:</strong> {{ message.content|linebreaksbr }}</p>
+  {% if history %}
+    <h2>Previous versions</h2>
+    <ul>
+      {% for item in history %}
+        <li>
+          <div><strong>Changed at:</strong> {{ item.changed_at }}</div>
+          <pre style="white-space: pre-wrap; border:1px solid #ddd; padding: 8px;">{{ item.old_content }}</pre>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No previous versions.</p>
+  {% endif %}
+{% endblock %}
