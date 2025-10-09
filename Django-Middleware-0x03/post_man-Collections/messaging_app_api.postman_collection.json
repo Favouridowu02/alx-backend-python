@@ -1,0 +1,180 @@
+{
+  "info": {
+    "name": "Messaging App API",
+    "_postman_id": "b4f2c4b0-2c1e-4f6f-9a3e-123456789abc",
+    "description": "Collection to test authentication, conversations, and messages endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Obtain Token",
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "let json = pm.response.json();",
+                    "if (json.access) pm.environment.set('access_token', json.access);",
+                    "if (json.refresh) pm.environment.set('refresh_token', json.refresh);"
+                  ],
+                  "type": "text/javascript"
+                }
+              }
+            ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {"raw": "{{base_url}}/api/token/", "host": ["{{base_url}}"], "path": ["api", "token", ""]},
+            "body": {"mode": "raw", "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}"}
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = pm.response.json();",
+                  "if (json.access) pm.environment.set('access_token', json.access);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {"raw": "{{base_url}}/api/token/refresh/", "host": ["{{base_url}}"], "path": ["api", "token", "refresh", ""]},
+            "body": {"mode": "raw", "raw": "{\n  \"refresh\": \"{{refresh_token}}\"\n}"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Conversations",
+      "item": [
+        {
+          "name": "Create Conversation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "let json = pm.response.json();",
+                  "if (json.conversation_id) pm.environment.set('conversation_id', json.conversation_id);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {"raw": "{{base_url}}/api/conversations/", "host": ["{{base_url}}"], "path": ["api", "conversations", ""]},
+            "body": {"mode": "raw", "raw": "{\n  \"participants\": [\"{{other_user_id}}\"]\n}"}
+          }
+        },
+        {
+          "name": "List Conversations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": {"raw": "{{base_url}}/api/conversations/", "host": ["{{base_url}}"], "path": ["api", "conversations", ""]}
+          }
+        },
+        {
+          "name": "Get Conversation Detail",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": {"raw": "{{base_url}}/api/conversations/{{conversation_id}}/", "host": ["{{base_url}}"], "path": ["api", "conversations", "{{conversation_id}}", ""]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Send Message",
+          "event": [
+            {
+              "listen": "test",
+              "script": {"exec": ["let json = pm.response.json(); if (json.message_id) pm.environment.set('message_id', json.message_id);"], "type": "text/javascript"}
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {"raw": "{{base_url}}/api/messages/", "host": ["{{base_url}}"], "path": ["api", "messages", ""]},
+            "body": {"mode": "raw", "raw": "{\n  \"conversation\": \"{{conversation_id}}\",\n  \"message_body\": \"Hello from Postman!\"\n}"}
+          }
+        },
+        {
+          "name": "List Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": {"raw": "{{base_url}}/api/messages/", "host": ["{{base_url}}"], "path": ["api", "messages", ""]}
+          }
+        },
+        {
+          "name": "List Messages Filtered (by conversation)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"}
+            ],
+            "url": {"raw": "{{base_url}}/api/messages/?conversation={{conversation_id}}", "host": ["{{base_url}}"], "path": ["api", "messages", ""], "query": [{"key": "conversation", "value": "{{conversation_id}}"}]}
+          }
+        }
+      ]
+    },
+    {
+      "name": "Negative Tests",
+      "item": [
+        {
+          "name": "List Conversations Unauth",
+          "request": {
+            "method": "GET",
+            "url": {"raw": "{{base_url}}/api/conversations/", "host": ["{{base_url}}"], "path": ["api", "conversations", ""]}
+          }
+        },
+        {
+          "name": "Send Message Not Participant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{access_token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": {"raw": "{{base_url}}/api/messages/", "host": ["{{base_url}}"], "path": ["api", "messages", ""]},
+            "body": {"mode": "raw", "raw": "{\n  \"conversation\": \"00000000-0000-0000-0000-000000000000\",\n  \"message_body\": \"Should Fail\"\n}"}
+          }
+        }
+      ]
+    }
+  ],
+  "event": [],
+  "variable": []
+}
