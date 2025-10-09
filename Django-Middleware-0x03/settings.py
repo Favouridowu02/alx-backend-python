@@ -53,6 +53,7 @@ MIDDLEWARE = [
     'chats.middleware.RequestLoggingMiddleware',
     'chats.middleware.RestrictAccessByTimeMiddleware',
     'chats.middleware.OffensiveLanguageMiddleware',
+    'chats.middleware.RolepermissionMiddleware', 
 ]
 
 ROOT_URLCONF = 'messaging_app.urls'
@@ -167,3 +168,17 @@ LOGGING = {
         },
     },
 }
+
+# Time window for chat access (403 outside this window)
+CHAT_ACCESS_START_HOUR = 18  # 6 PM
+CHAT_ACCESS_END_HOUR = 21    # 9 PM
+
+# Rate limiting config
+CHAT_RATE_LIMIT_WINDOW_SECONDS = 60
+CHAT_RATE_LIMIT_MAX_MESSAGES = 5
+CHAT_MESSAGE_PATH_PREFIXES = ('/api/messages', '/messages') 
+
+
+# Role permissions config
+ROLE_PERMISSION_ALLOWED_ROLES = ('admin', 'moderator')
+ROLE_PERMISSION_EXEMPT_PATH_PREFIXES = ('/admin', '/api/token', '/api/token/refresh', '/static', '/media')
