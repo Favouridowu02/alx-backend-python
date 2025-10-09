@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'chats.middleware.RequestLoggingMiddleware',
 ]
 
 ROOT_URLCONF = 'messaging_app.urls'
@@ -140,3 +141,27 @@ REST_FRAMEWORK = {
 
 # Use custom user model
 AUTH_USER_MODEL = 'chats.User'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'request_simple': {'format': '%(asctime)s - %(message)s'},
+    },
+    'handlers': {
+        'request_file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'requests.log',
+            'maxBytes': 1_048_576,  # 1MB
+            'backupCount': 3,
+            'formatter': 'request_simple',
+        },
+    },
+    'loggers': {
+        'request_logger': {
+            'handlers': ['request_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
