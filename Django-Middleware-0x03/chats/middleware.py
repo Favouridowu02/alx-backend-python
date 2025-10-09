@@ -91,3 +91,36 @@ class OffensiveLanguageMiddleware:
             cache.set(cache_key, timestamps, timeout=self.window_seconds)
 
     return self.get_response(request)
+
+
+class RolepermissionMiddleware:
+    """
+        Middleware that restricts access to certain views based on user roles.
+    """
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.allowed_roles = set(getattr(settings, 'ROLE_PERMISSION_ALLOWED_ROLES', ('admin', 'moderator')))
+        self.exempt_prefixes = tuple(getattr(
+            settings,
+            'ROLE_PERMISSION_EXEMPT_PATH_PREFIXES',
+            ('/admin', '/api/token', '/api/token/refresh', '/static', '/media')
+        ))
+
+    def __call__(self, request):
+        # Skip checks for exempt paths
+        if any(request.path.startswith(p) for p in self.exempt_prefixes):
+            return self.get_response(request)
+
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return JsonResponse({'detail': 'Forbidden: authentication required.'}, status=403)
+
+        # Superusers always allowed
+        if getattr(user, 'is_superuser', False):
+            return self.get_response(request)
+
+        role = getattr(user, 'role', None)
+        if role not in self.allowed_roles:
+            return JsonResponse({'detail': 'Access forbidden: insufficient role permissions.'}, status=403)
+
+        return self.get_response(request)
