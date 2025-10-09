@@ -1,5 +1,9 @@
 import logging
 from datetime import datetime, timezone
+from django.conf import settings
+from django.http import JsonResponse
+from django.utils import timezone as dj_timezone
+from django.core.cache import cache
 
 
 class RequestLoggingMiddleware:
@@ -44,3 +48,46 @@ class RestrictAccessByTimeMiddleware:
             return JsonResponse({'detail': msg}, status=403)
 
         return self.get_response(request)
+
+
+class OffensiveLanguageMiddleware:
+    """
+        Middleware that limits the number of chat messages a user can send within a certain time window, based on thier IP address.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        self.window_seconds = int(getattr(settings, 'CHAT_RATE_LIMIT_WINDOW_SECONDS', 60))
+        self.max_messages = int(getattr(settings, 'CHAT_RATE_LIMIT_MAX_MESSAGES', 5))
+        # Path to applly the Rate Limit to
+        self.path_prefixes = tuple(getattr(
+            settings,
+            'CHAT_MESSAGE_PATH_PREFIXES',
+            ('/api/messages', '/messages')
+        ))
+
+    def _client_ip(self, request):
+        xff = request.META.get('HTTP_X_FORWARDED_FOR')
+        if xff:
+            return xff.split(',')[0].strip()
+        return request.META.get('REMOTE_ADDR', 'unknown')
+
+    def __call__(self, request):
+        if request.method.upper() == "POST" and any(request.path.startswith(p) for p in self.path_prefixes):
+            ip = self._client_ip(request)
+            cache_key = f"chat_rate:{ip}"
+            now_ts = dj_timezone.now().timestamp()
+
+            timestamps = cache.get(cache_key, [])
+            cutoff = now_ts - self.window_seconds
+            timestamps = [ts for ts in timestamps if ts > cutoff]
+
+            if len(timestamps) >= self.max_messages:
+                retry_after = int(timestamps[0] + self.window_seconds - now_ts) if timestamps else self.window_seconds
+                detail = f"Rate limit exceeded: max {self.max_messages} messages per {self.window_seconds} seconds."
+                 return JsonResponse({'detail': detail}, status=429, headers={'Retry-After': str(max(retry_after, 1))})
+
+            timestamps.append(now_ts)
+            cache.set(cache_key, timestamps, timeout=self.window_seconds)
+
+    return self.get_response(request)
