@@ -59,3 +59,9 @@ class MessageViewSet(viewsets.ModelViewSet):
         if instance.sender != self.request.user:
             raise PermissionDenied("Only the sender can edit this message")
         serializer.save()
+
+    def perform_destroy(self, instance):
+        # restrict deletes to original sender
+        if instance.sender != self.request.user:
+            raise PermissionDenied("Only the sender can delete this message")
+        instance.delete()
