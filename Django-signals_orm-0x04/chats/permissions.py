@@ -1,5 +1,8 @@
 from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
+from typing import Any
+
+from .models import Message
 
 class IsOwner(permissions.BasePermission):
     """Allow access only to object owners (objects with a 'user' attribute)."""
@@ -52,11 +55,44 @@ class IsParticipantOfConversation(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if not (request.user and request.user.is_authenticated):
             return False
+
+        if request.method in ("PUT", "PATCH", "DELETE"):
+            conv_id = None
+            # prefer client-sent conversation_id (in request.data)
+            try:
+                data = request.data
+                conv_id = data.get('conversation_id') or data.get('conversation')
+            except Exception:
+                conv_id = None
+
+            # fallback to object attributes
+            if not conv_id:
+                conv_id = getattr(obj, 'conversation_id', None)
+            if not conv_id:
+                conv = getattr(obj, 'conversation', None)
+                conv_id = getattr(conv, 'conversation_id', None) if conv is not None else None
+
+            if not conv_id:
+                raise PermissionDenied(detail="Missing conversation identifier; access denied.")
+
+            try:
+                allowed = Message.objects.filter(
+                    conversation_id=conv_id,
+                    conversation__participants__pk=request.user.pk,
+                ).exists()
+            except Exception:
+                allowed = False
+
+            if not allowed:
+                raise PermissionDenied(detail="You are not a participant of this conversation or message.")
+
+            return True
+
+        # Default: use the generic participant helper
         is_participant = self._is_participant(request.user, obj)
         if not is_participant:
             raise PermissionDenied(detail="You are not a participant of this conversation or message.")
 
-        # user is a participant, allow the request
         return True
 
 
