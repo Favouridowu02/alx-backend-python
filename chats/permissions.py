@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from rest_framework.exceptions import PermissionDenied
 
 class IsOwner(permissions.BasePermission):
     """Allow access only to object owners (objects with a 'user' attribute)."""
@@ -53,11 +52,6 @@ class IsParticipantOfConversation(permissions.BasePermission):
         if not (request.user and request.user.is_authenticated):
             return False
         is_participant = self._is_participant(request.user, obj)
-        if not is_participant:
-            raise PermissionDenied(detail="You are not a participant of this conversation or message.")
-
-        # user is a participant, allow the request
-        return True
-
-
-# "conversation_id", "Message.objects.filter", "HTTP_403_FORBIDDEN"
+        if request.method in permissions.SAFE_METHODS:
+            return is_participant
+        return is_participant

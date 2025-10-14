@@ -1,8 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.db import transaction
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from .permissions import IsOwner, IsParticipantOfConversation
@@ -21,7 +18,7 @@ from .models import (
 # Create your views here.
 class ConversationViewSet(viewsets.ModelViewSet):
     """
-    This is the bConversation ViewSet
+    This is the Conversation ViewSet
     """
     queryset = Conversation.objects.all()
     serializer_class = ConversationSerializer
@@ -62,14 +59,3 @@ class MessageViewSet(viewsets.ModelViewSet):
         if instance.sender != self.request.user:
             raise PermissionDenied("Only the sender can edit this message")
         serializer.save()
-
-
-class DeleteUserView(APIView):
-    """Allow the authenticated user to delete their own account."""
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request):
-        user = request.user
-        with transaction.atomic():
-            user.delete()
-        return Response({"detail": "Account deleted"}, status=status.HTTP_200_OK)
